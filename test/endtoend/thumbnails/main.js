@@ -13,10 +13,18 @@ const uppyThumbnails = Uppy({
 uppyThumbnails.use(ThumbnailGenerator, {})
 uppyThumbnails.use(FileInput, { target: '#uppyThumbnails', pretty: false })
 
-uppyThumbnails.on('thumbnail:generated', (file) => {
+uppyThumbnails.on('file-added', (file) => {
+  const el = document.createElement('p')
+  el.className = 'file-name'
+  el.textContent = file.name
+  document.body.appendChild(el)
+})
+
+uppyThumbnails.on('thumbnail:generated', (file, preview) => {
   const img = new Image()
   img.src = file.preview
+  img.className = 'file-preview'
+  img.style.display = 'block'
 
   document.body.appendChild(img)
 })
-window.ready = new Promise((resolve) => uppyThumbnails.on('thumbnail:ready', resolve))

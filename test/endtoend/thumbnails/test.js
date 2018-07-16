@@ -1,4 +1,4 @@
-/* global browser, expect, $ */
+/* global browser, expect, $, $$ */
 const path = require('path')
 const fs = require('fs')
 const { selectFakeFile, supportsChooseFile } = require('../utils')
@@ -35,6 +35,29 @@ describe.only('ThumbnailGenerator', () => {
       }
     }
 
-    browser.pause(20 * 1000)
+    browser.executeAsync((cb) => {
+      window.uppyThumbnails.on('thumbnail:ready', () => cb())
+    })
+
+    // const names = $$('p.file-name')
+    const previews = $$('img.file-preview')
+
+    // Names should all be listed before previews--indicates that previews were generated asynchronously.
+    /* Nevermind this, chooseFile() doesn't accept multiple files so they are added one by one and the thumbnails
+     * have finished generating by the time we add the next.
+    const nys = names.map((el) => el.getLocation('y'))
+    const pys = previews.map((el) => el.getLocation('y'))
+    for (const ny of nys) {
+      for (const py of pys) {
+        expect(ny).to.be.below(py, 'names should be listed before previews')
+      }
+    }
+    */
+
+    expect(previews).to.have.lengthOf(3)
+    for (const p of previews) {
+      expect(p.getAttribute('src')).to.match(/^blob:/)
+      expect(p.getElementSize('width')).to.equal(200)
+    }
   })
 })

@@ -158,9 +158,7 @@ module.exports = class ThumbnailGenerator extends Plugin {
    * Set the preview URL for a file.
    */
   setPreviewURL (fileID, preview) {
-    this.uppy.setFileState(fileID, {
-      preview: preview
-    })
+    this.uppy.setFileState(fileID, { preview })
   }
 
   addToQueue (item) {
@@ -188,11 +186,11 @@ module.exports = class ThumbnailGenerator extends Plugin {
       return this.createThumbnail(file, this.opts.thumbnailWidth)
         .then(preview => {
           this.setPreviewURL(file.id, preview)
-          this.uppy.emit('thumbnail:generated', file, preview)
+          this.uppy.emit('thumbnail:generated', this.uppy.getFile(file.id), preview)
         })
         .catch(err => {
           console.warn(err.stack || err.message)
-          this.uppy.emit('thumbnail:error', file, err)
+          this.uppy.emit('thumbnail:error', this.uppy.getFile(file.id), err)
         })
     }
     return Promise.resolve()
